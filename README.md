@@ -9,7 +9,7 @@ Full-stack app con React + Node.js API + PostgreSQL, orquestada con Docker Compo
 
 1. Clona el repositorio con sus submódulos:
    ```bash
-   git clone --recurse-submodules https://github.com/tu-usuario/reto-ILU.git
+   git clone --recurse-submodules https://github.com/0Jarvisx/reto-ILU.git
    cd reto-ILU
    ```
 
