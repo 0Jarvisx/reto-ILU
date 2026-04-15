@@ -1,0 +1,68 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: ilu-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api-server
+      - react-app
+    networks:
+      - ilu-network
+
+  api-server:
+    build:
+      context: ./api-ILU
+      target: production
+    container_name: ilu-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ilu}:${POSTGRES_PASSWORD:-ilu}@db:5432/${POSTGRES_DB:-ilu_db}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ilu-network
+
+  react-app:
+    build:
+      context: ./frontend-ILU
+      dockerfile: Dockerfile
+    container_name: ilu-react
+    restart: unless-stopped
+    networks:
+      - ilu-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: ilu-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ilu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ilu}
+      POSTGRES_DB: ${POSTGRES_DB:-ilu_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ilu} -d ${POSTGRES_DB:-ilu_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ilu-network
+
+networks:
+  ilu-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  uploads:

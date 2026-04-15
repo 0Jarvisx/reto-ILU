@@ -1,0 +1,6 @@
+[submodule "frontend-ILU"]
+	path = frontend-ILU
+	url = https://github.com/0Jarvisx/frontend-ILU.git
+[submodule "api-ILU"]
+	path = api-ILU
+	url = https://github.com/0Jarvisx/api-ILU.git
